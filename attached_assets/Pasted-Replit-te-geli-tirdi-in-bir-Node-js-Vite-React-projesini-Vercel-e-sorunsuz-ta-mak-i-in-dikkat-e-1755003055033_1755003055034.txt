@@ -1,0 +1,126 @@
+Replit’te geliştirdiğin bir Node.js + Vite + React projesini Vercel’e sorunsuz taşımak için dikkat etmen gereken noktaları adım adım listeleyeyim:
+
+---
+
+## **1. Proje yapısını netleştir**
+
+* **Klasör ayrımı:**
+
+  ```
+  /client     → React + Vite frontend
+  /server     → Express / API backend
+  /shared     → Ortak TypeScript dosyaları
+  ```
+* **`dist/`** gibi build klasörlerini `.gitignore`’a ekle (Vercel zaten yeniden build eder).
+* Vercel’de backend olarak çalışacak dosyanın **default export** ile Express app’i döndürüyor olması gerekir.
+
+---
+
+## **2. `package.json` düzeni**
+
+* **Scripts**:
+
+  ```json
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc -p tsconfig.server.json",
+    "start": "node dist/server/index.js"
+  }
+  ```
+* `dependencies` ile `devDependencies` ayrımını doğru yap:
+
+  * **dependencies** → runtime’da lazım olan paketler (`express`, `react`, `react-dom`, vb.)
+  * **devDependencies** → sadece geliştirme sırasında lazım olan paketler (`vite`, `typescript`, `@types/*`, vb.)
+* `type` alanı **"module"** olmalı (ESM kullanıyorsan).
+
+---
+
+## **3. TypeScript ayarları**
+
+* **Client** ve **Server** için ayrı `tsconfig` dosyaları önerilir:
+
+  * `tsconfig.json` → Client (noEmit, JSX, DOM lib)
+  * `tsconfig.server.json` → Server (Node lib, outDir tanımlı)
+* `allowImportingTsExtensions` gibi Vercel’de build’i bozabilecek deneysel ayarları kaldır.
+
+---
+
+## **4. Vercel yapılandırması (`vercel.json`)**
+
+* Örnek:
+
+  ```json
+  {
+    "version": 2,
+    "builds": [
+      { "src": "server/index.ts", "use": "@vercel/node" },
+      { "src": "client/package.json", "use": "@vercel/static-build" }
+    ],
+    "routes": [
+      { "src": "/api/(.*)", "dest": "server/index.ts" },
+      { "src": "/(.*)", "dest": "/client/dist/$1" }
+    ]
+  }
+  ```
+* Eğer full-stack tek repo ise, build script’in hem client’ı hem server’ı üretmesi gerekir.
+
+---
+
+## **5. Express entegrasyonu**
+
+* Server tarafında `app.listen` **sadece lokal geliştirme** modunda çalışmalı:
+
+  ```ts
+  if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => console.log(`Local server: ${PORT}`));
+  }
+  export default app;
+  ```
+* Vercel, `export default` üzerinden app’i kendi çalıştırır.
+
+---
+
+## **6. Statik dosya servisi**
+
+* `vite build` sonrası çıkan client build’i `dist/public` veya benzeri klasörden serve etmelisin:
+
+  ```ts
+  import path from "path";
+  import express from "express";
+
+  app.use(express.static(path.join(__dirname, "../public")));
+  ```
+
+---
+
+## **7. Ortam değişkenleri**
+
+* Replit’te `.env` dosyası kullanıyorsan, Vercel’de **Project Settings → Environment Variables** kısmına eklemeyi unutma.
+* `.env` dosyasını GitHub’a pushlama.
+
+---
+
+## **8. Build sürecini test et**
+
+* Replit’te veya lokalinde şu komutları çalıştır:
+
+  ```sh
+  npm install
+  npm run build
+  npm start
+  ```
+* Build ve start hatasız çalışıyorsa Vercel’de de çalışması çok yüksek ihtimaldir.
+
+---
+
+💡 **Ek ipucu:**
+Replit’te her şey çalışsa bile, Vercel’de build hatası alıyorsan genelde sebep:
+
+* TS config yanlışlığı
+* Node sürümü uyumsuzluğu (Vercel `engines.node`’u package.json’da belirtmeni ister)
+* Çift `tsconfig` yerine tek config kullanılması ama client-server karmaşası
+
+---
+
+İstersen ben sana **Replit → Vercel uyumlu final dizin yapısı** şablonunu da çıkarabilirim, böylece hatasız bir şekilde deploy edersin.
+İster misin onu da hazırlayayım?

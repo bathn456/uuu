@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { insertAlgorithmSchema, insertAlgorithmContentSchema, insertProjectSchema, insertFileSchema, insertNoteSchema } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";
 import rateLimit from 'express-rate-limit';
-import { AdminAuth, requireAdmin, securityHeaders, AuthenticatedRequest, loginRateLimit } from "./auth";
+import { AdminAuth, requireAdmin, securityHeaders, AuthenticatedRequest, loginRateLimit } from "./auth.js";
 
 // Configure multer for file uploads with high quality settings
 const upload = multer({

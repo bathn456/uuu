@@ -225,7 +225,7 @@ export class MemStorage implements IStorage {
 }
 
 // Database storage implementation
-import { db } from "./db";
+import { db } from "./db.js";
 import { algorithms, algorithmContent, projects, files, notes } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 

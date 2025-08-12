@@ -1,14 +1,14 @@
 import { sql } from "drizzle-orm";
-import { mysqlTable, text, varchar, timestamp, int, json } from "drizzle-orm/mysql-core";
+import { pgTable, text, varchar, timestamp, integer, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const algorithms = mysqlTable("algorithms", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`(UUID())`),
+export const algorithms = pgTable("algorithms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description").notNull(),
   icon: text("icon").notNull().default("fas fa-brain"),
-  resourceCount: int("resource_count").notNull().default(0),
+  resourceCount: integer("resource_count").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

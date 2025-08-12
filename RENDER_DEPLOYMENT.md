@@ -17,14 +17,12 @@
    - GitHub repository'nizi seçin
    - Branch: `main`
 
-4. **Build & Start Commands** (Manual Settings Required):
+4. **Build & Start Commands:**
    - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `node dist/server/server/index.js`
+   - **Start Command:** `node start-production.js`
    
-   **IMPORTANT**: Render ignores render.yaml for free plans. You must set these manually in dashboard:
-   - Go to Settings → Build & Deploy
-   - Set Build Command: `npm install && npm run build`
-   - Set Start Command: `node dist/server/server/index.js`
+   **Updated Solution**: Created `start-production.js` script that Render can execute directly.
+   This eliminates the need for manual dashboard settings.
 
 5. **Environment Variables:**
    - `NODE_ENV` = `production`

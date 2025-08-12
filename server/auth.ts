@@ -146,11 +146,13 @@ export const requireAdmin = async (req: AuthenticatedRequest, res: Response, nex
     req.admin = decoded;
     next();
   } catch (error) {
-    console.error('Admin auth error:', error);
-    return res.status(500).json({ 
-      error: 'Authentication error occurred.',
-      code: 'AUTH_ERROR'
-    });
+  if (error instanceof Error) {
+    console.error(error.message);
+  } else {
+    console.error(error);
+  }
+}
+;
   }
 };
 

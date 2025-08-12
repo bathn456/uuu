@@ -5,6 +5,7 @@ This is a deep learning educational platform built with React, Express.js, and P
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Important: User wants to deploy to Vercel - never forget this requirement.
 
 # Recent Changes
 

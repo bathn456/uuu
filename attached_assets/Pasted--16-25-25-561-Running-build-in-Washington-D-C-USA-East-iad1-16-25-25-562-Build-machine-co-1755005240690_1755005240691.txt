@@ -1,0 +1,76 @@
+[16:25:25.561] Running build in Washington, D.C., USA (East) – iad1
+[16:25:25.562] Build machine configuration: 2 cores, 8 GB
+[16:25:25.579] Cloning github.com/bathn456/uuu (Branch: main, Commit: 0d66460)
+[16:25:26.029] Cloning completed: 449.000ms
+[16:25:26.783] Restored build cache from previous deployment (Bn5qeKkrac2oBpE2eKPCzmaTZQDV)
+[16:25:30.722] Running "vercel build"
+[16:25:31.674] Vercel CLI 44.7.3
+[16:25:32.481] Running "install" command: `npm install`...
+[16:25:34.794] 
+[16:25:34.794] up to date, audited 541 packages in 2s
+[16:25:34.795] 
+[16:25:34.795] 72 packages are looking for funding
+[16:25:34.795]   run `npm fund` for details
+[16:25:34.827] 
+[16:25:34.828] 8 vulnerabilities (1 low, 7 moderate)
+[16:25:34.828] 
+[16:25:34.828] To address issues that do not require attention, run:
+[16:25:34.829]   npm audit fix
+[16:25:34.829] 
+[16:25:34.829] To address all issues (including breaking changes), run:
+[16:25:34.829]   npm audit fix --force
+[16:25:34.829] 
+[16:25:34.830] Run `npm audit` for details.
+[16:25:35.071] 
+[16:25:35.075] > rest-express@1.0.0 build
+[16:25:35.075] > vite build && tsc -p tsconfig.server.json
+[16:25:35.075] 
+[16:25:35.355] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[16:25:35.409] transforming...
+[16:25:36.068] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[16:25:36.069]   npx update-browserslist-db@latest
+[16:25:36.070]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[16:25:40.919] [32m✓[39m 1730 modules transformed.
+[16:25:41.302] rendering chunks...
+[16:25:41.312] computing gzip size...
+[16:25:41.329] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[16:25:41.329] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[16:25:41.330] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[16:25:41.330] [32m✓ built in 5.95s[39m
+[16:25:45.977] Installing dependencies...
+[16:25:47.082] 
+[16:25:47.082] up to date in 1s
+[16:25:47.083] 
+[16:25:47.083] 72 packages are looking for funding
+[16:25:47.083]   run `npm fund` for details
+[16:25:47.096] Running "npm run vercel-build"
+[16:25:47.224] 
+[16:25:47.225] > rest-express@1.0.0 vercel-build
+[16:25:47.225] > npm run build
+[16:25:47.225] 
+[16:25:47.357] 
+[16:25:47.361] > rest-express@1.0.0 build
+[16:25:47.362] > vite build && tsc -p tsconfig.server.json
+[16:25:47.362] 
+[16:25:47.618] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[16:25:47.670] transforming...
+[16:25:47.979] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[16:25:47.979]   npx update-browserslist-db@latest
+[16:25:47.980]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[16:25:52.576] [32m✓[39m 1730 modules transformed.
+[16:25:52.912] rendering chunks...
+[16:25:52.921] computing gzip size...
+[16:25:52.935] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[16:25:52.935] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[16:25:52.936] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[16:25:52.936] [32m✓ built in 5.29s[39m
+[16:25:57.825] Using TypeScript 5.6.3 (local user-provided)
+[16:26:01.566] api/index.ts(2,25): error TS7016: Could not find a declaration file for module '../dist/server/server/index.js'. '/vercel/path0/dist/server/server/index.js' implicitly has an 'any' type.
+[16:26:01.567] 
+[16:26:11.690] Build Completed in /vercel/output [39s]
+[16:26:11.964] Deploying outputs...
+[16:26:26.172] Deployment completed
+[16:26:27.276] Creating build cache...
+[16:26:45.982] Created build cache: 18.702s
+[16:26:45.983] Uploading build cache [82.32 MB]
+[16:26:47.250] Build cache uploaded: 1.272s

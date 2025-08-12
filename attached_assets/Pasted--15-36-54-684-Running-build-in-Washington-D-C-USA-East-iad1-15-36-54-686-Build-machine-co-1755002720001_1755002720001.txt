@@ -1,0 +1,46 @@
+[15:36:54.684] Running build in Washington, D.C., USA (East) – iad1
+[15:36:54.686] Build machine configuration: 2 cores, 8 GB
+[15:36:54.754] Cloning github.com/bathn456/uuu (Branch: main, Commit: c23b6c1)
+[15:36:55.802] Cloning completed: 1.048s
+[15:36:56.817] Restored build cache from previous deployment (CeWUTiK32aqqtFbJzoh87g9iz8Qg)
+[15:37:00.721] Running "vercel build"
+[15:37:01.194] Vercel CLI 44.7.3
+[15:37:01.804] Running "install" command: `npm install`...
+[15:37:04.516] 
+[15:37:04.517] removed 2 packages, changed 1 package, and audited 541 packages in 3s
+[15:37:04.518] 
+[15:37:04.518] 72 packages are looking for funding
+[15:37:04.518]   run `npm fund` for details
+[15:37:04.560] 
+[15:37:04.560] 8 vulnerabilities (1 low, 7 moderate)
+[15:37:04.560] 
+[15:37:04.560] To address issues that do not require attention, run:
+[15:37:04.560]   npm audit fix
+[15:37:04.560] 
+[15:37:04.561] To address all issues (including breaking changes), run:
+[15:37:04.561]   npm audit fix --force
+[15:37:04.561] 
+[15:37:04.561] Run `npm audit` for details.
+[15:37:04.820] 
+[15:37:04.822] > rest-express@1.0.0 build
+[15:37:04.823] > vite build && tsc -p tsconfig.server.json
+[15:37:04.823] 
+[15:37:05.094] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[15:37:05.416] transforming...
+[15:37:05.617] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[15:37:05.618]   npx update-browserslist-db@latest
+[15:37:05.619]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[15:37:10.308] [32m✓[39m 1730 modules transformed.
+[15:37:10.633] rendering chunks...
+[15:37:10.644] computing gzip size...
+[15:37:10.659] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[15:37:10.660] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[15:37:10.660] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[15:37:10.660] [32m✓ built in 5.27s[39m
+[15:37:15.175] Build Completed in /vercel/output [13s]
+[15:37:15.301] Deploying outputs...
+[15:37:17.566] Deployment completed
+[15:37:18.406] Creating build cache...
+[15:37:32.366] Created build cache: 13.956s
+[15:37:32.366] Uploading build cache [82.34 MB]
+[15:37:33.498] Build cache uploaded: 1.135s

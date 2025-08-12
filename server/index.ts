@@ -27,13 +27,13 @@ app.use(express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 1000
     const { serveStatic } = await import("./vite.js");
     serveStatic(app);
   }
-})();
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-  });
-}
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
+  if (process.env.NODE_ENV !== "production") {
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://0.0.0.0:${PORT}`);
+    });
+  }
+})();
 
 export default app;

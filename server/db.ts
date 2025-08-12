@@ -8,18 +8,17 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// PlanetScale optimized connection pool configuration
+// PlanetScale compatible MySQL connection
 export const pool = mysql.createPool({
   uri: process.env.DATABASE_URL,
-  connectionLimit: 10, // Maximum number of connections in the pool
-  idleTimeout: 30000, // Close idle connections after 30 seconds
-  ssl: {
-    rejectUnauthorized: false // Required for PlanetScale connections
-  }
+  connectionLimit: 10,
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false
+  } : undefined
 });
 
 export const db = drizzle(pool, { 
   schema,
   mode: 'default',
-  logger: false // Disable query logging for performance
+  logger: false
 });

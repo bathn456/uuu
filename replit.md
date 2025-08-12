@@ -5,7 +5,7 @@ This is a deep learning educational platform built with React, Express.js, and P
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
-Important: User wants to deploy to Vercel - never forget this requirement.
+Important: User wants to deploy to Render.com for free hosting.
 
 # Recent Changes
 
@@ -43,12 +43,8 @@ Important: User wants to deploy to Vercel - never forget this requirement.
 - **REPLIT AGENT TO STANDARD REPLIT MIGRATION COMPLETED**: Successfully migrated project from Replit Agent to standard Replit environment with PostgreSQL database integration - installed all dependencies, fixed database schema, resolved server listening configuration, built client application, and ensured all components work properly on port 5000
 - **RENDER DEPLOYMENT READY**: Added Render.com deployment configuration with render.yaml, start.js script, and comprehensive deployment guide - project ready for free hosting with PostgreSQL database support
 - **RENDER START COMMAND FIXED**: Resolved deployment failure by updating start command from `node start.js` to `node dist/server/server/index.js` - build successful but deployment was failing due to missing start script
-- **VERCEL DEPLOYMENT SUCCESSFUL**: Project successfully deployed to Vercel with optimized configuration - build completed in 5.54s with 1730 modules transformed, TypeScript compilation successful, and all static assets properly generated
-- **VERCEL 404 ERROR FIXED**: Resolved NOT_FOUND error by updating vercel.json configuration for proper serverless function and static file serving - added buildCommand, outputDirectory, and hybrid static/function routing
-- **VERCEL DEPLOYMENT COMPLETED SUCCESSFULLY**: Fixed function pattern error by moving serverless entry point to api/index.ts, resolved TypeScript declaration warnings, deployment completed in 39s with all static assets properly generated
-- **FINAL VERCEL DEPLOYMENT PERFECT**: All issues resolved, TypeScript compilation clean, build completed in 5.20s with optimized assets (123.96kB gzipped JS, 12.08kB gzipped CSS), deployment successful and site now live on Vercel
-- **VERCEL SERVERLESS FUNCTION CRASH FIXED**: Resolved FUNCTION_INVOCATION_FAILED error by properly structuring api/index.ts for serverless environment - added async handler initialization, proper Express app setup, error boundaries, and static file serving for production
-- **VERCEL MODULE RESOLUTION FIXED**: Resolved ERR_MODULE_NOT_FOUND by adding .js extensions to all local module imports in server files - TypeScript now compiles to valid ESM modules that Vercel serverless environment can properly resolve
+- **VERCEL FILES COMPLETELY REMOVED**: Cleaned up all Vercel-related files, documentation, and references - project now focused solely on Render.com deployment for free hosting
+
 - **REPLIT AGENT TO STANDARD ENVIRONMENT MIGRATION COMPLETED**: Successfully migrated from Replit Agent to standard Replit environment with proper module resolution, installed all dependencies, fixed import paths from @shared/* to ../shared/*.js, configured database fallback, and server running on port 5000 with in-memory storage until PostgreSQL is configured
 
 # System Architecture

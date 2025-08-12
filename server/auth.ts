@@ -18,7 +18,7 @@ const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
 // Clean up old failed attempts every hour
 setInterval(() => {
   const now = Date.now();
-  for (const [ip, data] of failedAttempts.entries()) {
+  for (const [ip, data] of Array.from(failedAttempts.entries())) {
     if (now - data.lastAttempt > LOCKOUT_DURATION) {
       failedAttempts.delete(ip);
     }

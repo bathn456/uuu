@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
-import { insertAlgorithmSchema, insertAlgorithmContentSchema, insertProjectSchema, insertFileSchema, insertNoteSchema } from "@shared/schema";
+import { insertAlgorithmSchema, insertAlgorithmContentSchema, insertProjectSchema, insertFileSchema, insertNoteSchema } from "../shared/schema.js";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";

@@ -1,4 +1,4 @@
-import { type Algorithm, type InsertAlgorithm, type AlgorithmContent, type InsertAlgorithmContent, type Project, type InsertProject, type File, type InsertFile, type Note, type InsertNote } from "@shared/schema";
+import { type Algorithm, type InsertAlgorithm, type AlgorithmContent, type InsertAlgorithmContent, type Project, type InsertProject, type File, type InsertFile, type Note, type InsertNote } from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -226,7 +226,7 @@ export class MemStorage implements IStorage {
 
 // Database storage implementation
 import { db } from "./db.js";
-import { algorithms, algorithmContent, projects, files, notes } from "@shared/schema";
+import { algorithms, algorithmContent, projects, files, notes } from "../shared/schema.js";
 import { eq, and } from "drizzle-orm";
 
 export class DatabaseStorage implements IStorage {

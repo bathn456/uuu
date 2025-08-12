@@ -1,9 +1,6 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
 import * as schema from "@shared/schema";
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,16 +8,18 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Optimized connection pool configuration for better performance
-export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 10, // Maximum number of connections in the pool
-  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-  connectionTimeoutMillis: 2000, // Fail fast on connection timeout
+// PlanetScale optimized connection pool configuration
+export const pool = mysql.createPool({
+  uri: process.env.DATABASE_URL,
+  connectionLimit: 10, // Maximum number of connections in the pool
+  idleTimeout: 30000, // Close idle connections after 30 seconds
+  ssl: {
+    rejectUnauthorized: false // Required for PlanetScale connections
+  }
 });
 
-export const db = drizzle({ 
-  client: pool, 
+export const db = drizzle(pool, { 
   schema,
+  mode: 'default',
   logger: false // Disable query logging for performance
 });

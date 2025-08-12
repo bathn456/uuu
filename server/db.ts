@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -8,17 +8,14 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// PlanetScale compatible MySQL connection
-export const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL,
-  connectionLimit: 10,
-  ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: false
-  } : undefined
+// PostgreSQL connection for local development
+export const connection = postgres(process.env.DATABASE_URL, {
+  max: 10,
+  idle_timeout: 30,
+  connect_timeout: 10,
 });
 
-export const db = drizzle(pool, { 
+export const db = drizzle(connection, { 
   schema,
-  mode: 'default',
   logger: false
 });

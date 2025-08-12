@@ -37,9 +37,11 @@ export class AdminAuth {
   static isLockedOut(ip: string): boolean {
     const attempts = failedAttempts.get(ip);
     if (!attempts) return false;
-    
-    return attempts.count >= MAX_FAILED_ATTEMPTS && 
-           (Date.now() - attempts.lastAttempt) < LOCKOUT_DURATION;
+
+    return (
+      attempts.count >= MAX_FAILED_ATTEMPTS &&
+      Date.now() - attempts.lastAttempt < LOCKOUT_DURATION
+    );
   }
 
   // Record failed login attempt
@@ -57,10 +59,10 @@ export class AdminAuth {
 
   // Generate secure JWT token
   static generateToken(payload: any): string {
-    return jwt.sign(payload, JWT_SECRET, { 
+    return jwt.sign(payload, JWT_SECRET, {
       expiresIn: '24h',
       issuer: 'deep-learning-platform',
-      audience: 'admin'
+      audience: 'admin',
     });
   }
 
@@ -69,11 +71,15 @@ export class AdminAuth {
     try {
       const result = jwt.verify(token, JWT_SECRET, {
         issuer: 'deep-learning-platform',
-        audience: 'admin'
+        audience: 'admin',
       });
       return result;
     } catch (error) {
-      console.log('Token verification failed:', error.message);
+      if (error instanceof Error) {
+        console.log('Token verification failed:', error.message);
+      } else {
+        console.log('Token verification failed:', error);
+      }
       return null;
     }
   }
@@ -98,7 +104,7 @@ export const loginRateLimit = {
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 requests per windowMs
   message: {
-    error: 'Too many login attempts from this IP, please try again after 15 minutes.'
+    error: 'Too many login attempts from this IP, please try again after 15 minutes.',
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -106,53 +112,57 @@ export const loginRateLimit = {
 };
 
 // Admin authentication middleware
-export const requireAdmin = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const requireAdmin = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const authHeader = req.headers.authorization;
     console.log('Auth middleware - Headers:', { authorization: authHeader });
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('Auth middleware - No valid Bearer token');
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Access denied. No valid authentication token provided.',
-        code: 'NO_TOKEN'
+        code: 'NO_TOKEN',
       });
     }
 
     const token = authHeader.substring(7);
     console.log('Auth middleware - Extracted token length:', token.length);
     console.log('Auth middleware - JWT_SECRET available:', !!JWT_SECRET);
-    
+
     const decoded = AdminAuth.verifyToken(token);
     console.log('Auth middleware - Token verification result:', !!decoded);
-    
+
     if (!decoded) {
       console.log('Auth middleware - Token verification failed');
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Access denied. Invalid or expired token.',
-        code: 'INVALID_TOKEN'
+        code: 'INVALID_TOKEN',
       });
     }
 
     // Check token age (force re-login after 24 hours)
-    const tokenAge = Date.now() - decoded.loginTime;
-    if (tokenAge > 24 * 60 * 60 * 1000) {
-      return res.status(401).json({ 
-        error: 'Token expired. Please login again.',
-        code: 'TOKEN_EXPIRED'
-      });
+    if ('loginTime' in decoded && typeof decoded.loginTime === 'number') {
+      const tokenAge = Date.now() - decoded.loginTime;
+      if (tokenAge > 24 * 60 * 60 * 1000) {
+        return res.status(401).json({
+          error: 'Token expired. Please login again.',
+          code: 'TOKEN_EXPIRED',
+        });
+      }
     }
 
     req.admin = decoded;
     next();
   } catch (error) {
-  if (error instanceof Error) {
-    console.error(error.message);
-  } else {
-    console.error(error);
-  }
-}
-;
+    if (error instanceof Error) {
+      console.error(error.message);
+    } else {
+      console.error(error);
+    }
   }
 };
 
@@ -164,10 +174,10 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  
+
   // Remove server identification
   res.removeHeader('X-Powered-By');
-  
+
   next();
 };
 

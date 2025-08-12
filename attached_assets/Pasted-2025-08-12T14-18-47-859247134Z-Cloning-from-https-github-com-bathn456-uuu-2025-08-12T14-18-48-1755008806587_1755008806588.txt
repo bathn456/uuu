@@ -1,0 +1,50 @@
+2025-08-12T14:18:47.859247134Z ==> Cloning from https://github.com/bathn456/uuu
+2025-08-12T14:18:48.435862904Z ==> Checking out commit 20e82541ad8d1b13b4ec6d47759cc94de3ce85fa in branch main
+2025-08-12T14:18:49.854133587Z ==> Using Node.js version 22.16.0 (default)
+2025-08-12T14:18:49.880004011Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-08-12T14:18:51.683160523Z ==> Running build command 'npm install; npm run build'...
+2025-08-12T14:19:02.826810873Z 
+2025-08-12T14:19:02.826839293Z added 628 packages, and audited 629 packages in 11s
+2025-08-12T14:19:02.826866824Z 
+2025-08-12T14:19:02.826872144Z 78 packages are looking for funding
+2025-08-12T14:19:02.826880954Z   run `npm fund` for details
+2025-08-12T14:19:02.852172847Z 
+2025-08-12T14:19:02.852190847Z 11 vulnerabilities (1 low, 8 moderate, 2 high)
+2025-08-12T14:19:02.852194817Z 
+2025-08-12T14:19:02.852199767Z To address issues that do not require attention, run:
+2025-08-12T14:19:02.852203567Z   npm audit fix
+2025-08-12T14:19:02.852206867Z 
+2025-08-12T14:19:02.852210307Z To address all issues (including breaking changes), run:
+2025-08-12T14:19:02.852214227Z   npm audit fix --force
+2025-08-12T14:19:02.852217597Z 
+2025-08-12T14:19:02.852222277Z Run `npm audit` for details.
+2025-08-12T14:19:03.134924107Z 
+2025-08-12T14:19:03.134946137Z > rest-express@1.0.0 build
+2025-08-12T14:19:03.134952267Z > vite build && tsc -p tsconfig.server.json
+2025-08-12T14:19:03.134955807Z 
+2025-08-12T14:19:03.31325694Z vite v5.4.19 building for production...
+2025-08-12T14:19:03.364407296Z transforming...
+2025-08-12T14:19:03.636886714Z Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+2025-08-12T14:19:03.636904894Z   npx update-browserslist-db@latest
+2025-08-12T14:19:03.636909744Z   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2025-08-12T14:19:06.484688532Z ✓ 1730 modules transformed.
+2025-08-12T14:19:06.677201178Z rendering chunks...
+2025-08-12T14:19:06.684639312Z computing gzip size...
+2025-08-12T14:19:06.696607309Z ../dist/public/index.html                   1.47 kB │ gzip:   0.71 kB
+2025-08-12T14:19:06.696711101Z ../dist/public/assets/index-CKaqDpxg.css   68.22 kB │ gzip:  12.08 kB
+2025-08-12T14:19:06.696755572Z ../dist/public/assets/index-X71Ghumc.js   408.13 kB │ gzip: 123.96 kB
+2025-08-12T14:19:06.697050568Z ✓ built in 3.36s
+2025-08-12T14:19:14.975849068Z ==> Uploading build...
+2025-08-12T14:19:25.045170831Z ==> Uploaded in 6.7s. Compression took 3.4s
+2025-08-12T14:19:25.079042161Z ==> Build successful 🎉
+2025-08-12T14:19:29.181164308Z ==> Deploying...
+2025-08-12T14:19:54.764875322Z ==> Running 'yarn start'
+2025-08-12T14:19:56.559751149Z yarn run v1.22.22
+2025-08-12T14:19:56.859485382Z error Command "start" not found.
+2025-08-12T14:19:56.859730225Z info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+2025-08-12T14:20:01.953655604Z ==> Exited with status 1
+2025-08-12T14:20:02.097176358Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-08-12T14:20:07.297440643Z ==> Running 'yarn start'
+2025-08-12T14:20:08.495366068Z yarn run v1.22.22
+2025-08-12T14:20:08.795209452Z error Command "start" not found.
+2025-08-12T14:20:08.795328474Z info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

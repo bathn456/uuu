@@ -19,7 +19,7 @@
 
 4. **Build & Start Commands:**
    - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `node start.js`
+   - **Start Command:** `node dist/server/server/index.js`
 
 5. **Environment Variables:**
    - `NODE_ENV` = `production`
@@ -37,7 +37,13 @@
 - ✅ PostgreSQL database dahil
 - ✅ Zero-config deployment
 
-## Alternatif Start Commands:
-Eğer `node start.js` çalışmazsa:
-- `npm run dev` (development mode)
+## Alternative Start Commands:
+If the main command doesn't work, try these in Render settings:
+- `node dist/server/server/index.js` (production build)
 - `tsx server/index.ts` (direct TypeScript execution)
+- `npm run dev` (development mode - not recommended for production)
+
+## Troubleshooting:
+- Build successful ✅ (3.36s, 1730 modules)
+- Issue: Missing start script
+- Solution: Use direct node command to run compiled server

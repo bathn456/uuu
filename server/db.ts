@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// PostgreSQL connection for local development
+// PostgreSQL connection for development (MySQL schema ready for PlanetScale)
 export const connection = postgres(process.env.DATABASE_URL, {
   max: 10,
   idle_timeout: 30,

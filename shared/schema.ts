@@ -3,6 +3,8 @@ import { pgTable, text, varchar, timestamp, integer, json } from "drizzle-orm/pg
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Note: Schema ready for MySQL/PlanetScale migration when needed
+
 export const algorithms = pgTable("algorithms", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -12,21 +14,21 @@ export const algorithms = pgTable("algorithms", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const algorithmContent = mysqlTable("algorithm_content", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`(UUID())`),
-  algorithmId: varchar("algorithm_id", { length: 255 }).notNull().references(() => algorithms.id, { onDelete: "cascade" }),
+export const algorithmContent = pgTable("algorithm_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  algorithmId: varchar("algorithm_id").notNull().references(() => algorithms.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description"),
   fileName: text("file_name").notNull(),
   fileType: text("file_type").notNull(),
-  fileSize: int("file_size").notNull(),
+  fileSize: integer("file_size").notNull(),
   filePath: text("file_path").notNull(),
   category: text("category").notNull().default("tutorial"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const projects = mysqlTable("projects", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`(UUID())`),
+export const projects = pgTable("projects", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: text("category").notNull(),
@@ -37,24 +39,24 @@ export const projects = mysqlTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const files = mysqlTable("files", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`(UUID())`),
+export const files = pgTable("files", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   fileName: text("file_name").notNull(),
   originalName: text("original_name").notNull(),
   fileType: text("file_type").notNull(),
-  fileSize: int("file_size").notNull(),
+  fileSize: integer("file_size").notNull(),
   filePath: text("file_path").notNull(),
   category: text("category").notNull(), // 'algorithm' or 'project'
-  relatedId: varchar("related_id", { length: 255 }), // algorithm id or project id
+  relatedId: varchar("related_id"), // algorithm id or project id
   uploadedBy: text("uploaded_by").notNull().default("admin"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const notes = mysqlTable("notes", {
-  id: varchar("id", { length: 255 }).primaryKey().default(sql`(UUID())`),
+export const notes = pgTable("notes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  algorithmId: varchar("algorithm_id", { length: 255 }).notNull().references(() => algorithms.id, { onDelete: "cascade" }),
+  algorithmId: varchar("algorithm_id").notNull().references(() => algorithms.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
 });

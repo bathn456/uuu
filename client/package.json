@@ -1,0 +1,7 @@
+{
+  "name": "deep-learning-client",
+  "private": true,
+  "scripts": {
+    "build": "cd .. && npm run build"
+  }
+}

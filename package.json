@@ -8,6 +8,7 @@
     "build": "vite build && tsc -p tsconfig.server.json",
     "vercel-build": "npm run build",
     "check": "tsc",
+    "start": "node start-production.js",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {

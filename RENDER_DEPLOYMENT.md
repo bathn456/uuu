@@ -17,9 +17,14 @@
    - GitHub repository'nizi seçin
    - Branch: `main`
 
-4. **Build & Start Commands:**
+4. **Build & Start Commands** (Manual Settings Required):
    - **Build Command:** `npm install && npm run build`
    - **Start Command:** `node dist/server/server/index.js`
+   
+   **IMPORTANT**: Render ignores render.yaml for free plans. You must set these manually in dashboard:
+   - Go to Settings → Build & Deploy
+   - Set Build Command: `npm install && npm run build`
+   - Set Start Command: `node dist/server/server/index.js`
 
 5. **Environment Variables:**
    - `NODE_ENV` = `production`

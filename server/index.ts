@@ -1,7 +1,11 @@
 // server/index.ts
 import path from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import { registerRoutes } from "./routes";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -12,16 +16,17 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 10000 }));
 
 (async () => {
-  await registerRoutes(app);
+  const server = await registerRoutes(app);
 
-  // STATIC dosyalar
-  const publicPath = path.join(__dirname, "../dist/public");
-  app.use(express.static(publicPath));
-
-  // React Router fallback
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(publicPath, "index.html"));
-  });
+  if (process.env.NODE_ENV === "development") {
+    // Use Vite dev server in development
+    const { setupVite } = await import("./vite.js");
+    await setupVite(app, server);
+  } else {
+    // Serve static files in production
+    const { serveStatic } = await import("./vite.js");
+    serveStatic(app);
+  }
 })();
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;

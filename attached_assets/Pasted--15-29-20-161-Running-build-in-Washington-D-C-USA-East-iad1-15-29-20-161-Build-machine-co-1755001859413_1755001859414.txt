@@ -1,0 +1,48 @@
+[15:29:20.161] Running build in Washington, D.C., USA (East) – iad1
+[15:29:20.161] Build machine configuration: 2 cores, 8 GB
+[15:29:20.210] Cloning github.com/bathn456/uuu (Branch: main, Commit: 7b2161a)
+[15:29:20.727] Cloning completed: 517.000ms
+[15:29:21.457] Restored build cache from previous deployment (CeWUTiK32aqqtFbJzoh87g9iz8Qg)
+[15:29:25.410] Running "vercel build"
+[15:29:25.887] Vercel CLI 44.7.3
+[15:29:26.474] Running "install" command: `npm install`...
+[15:29:28.960] 
+[15:29:28.961] changed 2 packages, and audited 543 packages in 2s
+[15:29:28.961] 
+[15:29:28.961] 72 packages are looking for funding
+[15:29:28.961]   run `npm fund` for details
+[15:29:29.002] 
+[15:29:29.002] 9 vulnerabilities (1 low, 8 moderate)
+[15:29:29.002] 
+[15:29:29.003] To address issues that do not require attention, run:
+[15:29:29.003]   npm audit fix
+[15:29:29.003] 
+[15:29:29.003] To address all issues (including breaking changes), run:
+[15:29:29.003]   npm audit fix --force
+[15:29:29.003] 
+[15:29:29.004] Run `npm audit` for details.
+[15:29:29.558] 
+[15:29:29.558] > rest-express@1.0.0 build
+[15:29:29.559] > vite build && tsc -p tsconfig.server.json
+[15:29:29.559] 
+[15:29:29.832] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[15:29:30.167] transforming...
+[15:29:30.482] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[15:29:30.482]   npx update-browserslist-db@latest
+[15:29:30.482]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[15:29:34.948] [32m✓[39m 1730 modules transformed.
+[15:29:35.267] rendering chunks...
+[15:29:35.276] computing gzip size...
+[15:29:35.293] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[15:29:35.293] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[15:29:35.294] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[15:29:35.294] [32m✓ built in 5.15s[39m
+[15:29:39.563] server/db.ts(3,25): error TS6059: File '/vercel/path0/shared/schema.ts' is not under 'rootDir' '/vercel/path0/server'. 'rootDir' is expected to contain all source files.
+[15:29:39.564]   The file is in the program because:
+[15:29:39.564]     Imported via "@shared/schema" from file '/vercel/path0/server/db.ts'
+[15:29:39.564]     Imported via "@shared/schema" from file '/vercel/path0/server/storage.ts'
+[15:29:39.564]     Imported via "@shared/schema" from file '/vercel/path0/server/storage.ts'
+[15:29:39.564]     Imported via "@shared/schema" from file '/vercel/path0/server/routes.ts'
+[15:29:39.565]     Matched by include pattern 'shared/**/*' in 'tsconfig.server.json'
+[15:29:39.565] server/vite.ts(6,24): error TS6059: File '/vercel/path0/vite.config.ts' is not under 'rootDir' '/vercel/path0/server'. 'rootDir' is expected to contain all source files.
+[15:29:39.596] Error: Command "npm run build" exited with 2

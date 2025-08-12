@@ -1,14 +1,19 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": false,
-    "outDir": "dist/server",
-    "module": "CommonJS",
-    "target": "ES2019",
-    "moduleResolution": "node",
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist/server",
+    "rootDir": "./server",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["./shared/*"]
+    }
   },
   "include": ["server/**/*", "shared/**/*"],
   "exclude": ["node_modules", "dist", "client"]

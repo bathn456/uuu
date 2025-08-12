@@ -6,7 +6,6 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "server/index.ts" },
-    { "src": "/(.*)", "dest": "dist/public/$1" }
-  ],
-  "buildCommand": "npm install && npm run build"
+    { "src": "/(.*)", "dest": "dist/public/index.html" }
+  ]
 }

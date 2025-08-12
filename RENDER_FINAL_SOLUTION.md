@@ -2,9 +2,20 @@
 
 ## Root Cause Found ✅
 Yarn documentation confirms: `yarn start` looks for a `"start"` script in package.json.
-Our package.json is missing this script, causing the deployment failure.
+Our package.json is currently missing this script, causing the deployment failure.
 
-## Simple Fix Required:
+## Current package.json scripts section:
+```json
+"scripts": {
+  "dev": "NODE_ENV=development tsx server/index.ts",
+  "build": "vite build && tsc -p tsconfig.server.json",
+  "vercel-build": "npm run build",  // ← Should be removed
+  "check": "tsc",
+  "db:push": "drizzle-kit push"
+}
+```
+
+## Required Fix:
 
 ### 1. Add Start Script to package.json
 Add this line to the `"scripts"` section of package.json:
@@ -12,7 +23,10 @@ Add this line to the `"scripts"` section of package.json:
 "start": "node start-production.js"
 ```
 
-### 2. Complete scripts section should look like:
+### 2. Remove leftover Vercel script
+Remove the `"vercel-build"` line since we're using Render now.
+
+### 3. Complete scripts section should look like:
 ```json
 "scripts": {
   "start": "node start-production.js",

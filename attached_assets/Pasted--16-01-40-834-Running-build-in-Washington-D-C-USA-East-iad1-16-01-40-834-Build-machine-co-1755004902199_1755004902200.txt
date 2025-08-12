@@ -1,0 +1,49 @@
+[16:01:40.834] Running build in Washington, D.C., USA (East) – iad1
+[16:01:40.834] Build machine configuration: 2 cores, 8 GB
+[16:01:40.846] Cloning github.com/bathn456/uuu (Branch: main, Commit: c23b6c1)
+[16:01:40.862] Skipping build cache, deployment was triggered without cache.
+[16:01:41.247] Cloning completed: 401.000ms
+[16:01:43.730] Running "vercel build"
+[16:01:44.171] Vercel CLI 44.7.3
+[16:01:44.766] Running "install" command: `npm install`...
+[16:01:49.290] npm warn deprecated crypto@1.0.1: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
+[16:01:50.261] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[16:01:50.285] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[16:01:56.192] 
+[16:01:56.192] added 540 packages, and audited 541 packages in 11s
+[16:01:56.193] 
+[16:01:56.193] 72 packages are looking for funding
+[16:01:56.193]   run `npm fund` for details
+[16:01:56.233] 
+[16:01:56.234] 8 vulnerabilities (1 low, 7 moderate)
+[16:01:56.234] 
+[16:01:56.234] To address issues that do not require attention, run:
+[16:01:56.234]   npm audit fix
+[16:01:56.234] 
+[16:01:56.234] To address all issues (including breaking changes), run:
+[16:01:56.234]   npm audit fix --force
+[16:01:56.234] 
+[16:01:56.235] Run `npm audit` for details.
+[16:01:56.500] 
+[16:01:56.500] > rest-express@1.0.0 build
+[16:01:56.500] > vite build && tsc -p tsconfig.server.json
+[16:01:56.501] 
+[16:01:56.746] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[16:01:56.796] transforming...
+[16:01:57.105] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[16:01:57.106]   npx update-browserslist-db@latest
+[16:01:57.106]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[16:02:01.978] [32m✓[39m 1730 modules transformed.
+[16:02:02.293] rendering chunks...
+[16:02:02.302] computing gzip size...
+[16:02:02.315] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[16:02:02.315] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[16:02:02.316] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[16:02:02.316] [32m✓ built in 5.54s[39m
+[16:02:06.817] Build Completed in /vercel/output [22s]
+[16:02:06.921] Deploying outputs...
+[16:02:09.238] Deployment completed
+[16:02:10.096] Creating build cache...
+[16:02:23.427] Created build cache: 13.323s
+[16:02:23.428] Uploading build cache [82.32 MB]
+[16:02:24.424] Build cache uploaded: 1.005s

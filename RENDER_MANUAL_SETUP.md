@@ -3,6 +3,15 @@
 ## Current Issue:
 Render free tier is ignoring our `render.yaml` configuration and defaulting to `yarn start`.
 
+## SOLUTION FOUND:
+The issue is that `package.json` doesn't have a `start` script. Yarn documentation shows it looks for this script.
+
+## Quick Fix:
+Add this to package.json scripts section:
+```json
+"start": "node start-production.js"
+```
+
 ## Solution Steps:
 
 ### 1. Manual Dashboard Configuration

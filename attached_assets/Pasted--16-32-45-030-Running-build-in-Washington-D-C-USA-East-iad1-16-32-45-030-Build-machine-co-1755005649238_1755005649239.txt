@@ -1,0 +1,74 @@
+[16:32:45.030] Running build in Washington, D.C., USA (East) – iad1
+[16:32:45.030] Build machine configuration: 2 cores, 8 GB
+[16:32:45.046] Cloning github.com/bathn456/uuu (Branch: main, Commit: 5f0807d)
+[16:32:45.460] Cloning completed: 414.000ms
+[16:32:46.186] Restored build cache from previous deployment (CKYxshpNXycPzeeGjpNJQqdAfkoF)
+[16:32:50.088] Running "vercel build"
+[16:32:50.576] Vercel CLI 44.7.3
+[16:32:51.361] Running "install" command: `npm install`...
+[16:32:56.831] 
+[16:32:56.833] added 88 packages, and audited 629 packages in 5s
+[16:32:56.833] 
+[16:32:56.833] 78 packages are looking for funding
+[16:32:56.834]   run `npm fund` for details
+[16:32:56.883] 
+[16:32:56.884] 11 vulnerabilities (1 low, 8 moderate, 2 high)
+[16:32:56.884] 
+[16:32:56.884] To address issues that do not require attention, run:
+[16:32:56.885]   npm audit fix
+[16:32:56.885] 
+[16:32:56.885] To address all issues (including breaking changes), run:
+[16:32:56.885]   npm audit fix --force
+[16:32:56.886] 
+[16:32:56.886] Run `npm audit` for details.
+[16:32:57.138] 
+[16:32:57.140] > rest-express@1.0.0 build
+[16:32:57.140] > vite build && tsc -p tsconfig.server.json
+[16:32:57.140] 
+[16:32:57.446] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[16:32:57.784] transforming...
+[16:32:58.005] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[16:32:58.005]   npx update-browserslist-db@latest
+[16:32:58.005]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[16:33:03.041] [32m✓[39m 1730 modules transformed.
+[16:33:03.372] rendering chunks...
+[16:33:03.383] computing gzip size...
+[16:33:03.399] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[16:33:03.400] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[16:33:03.400] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[16:33:03.401] [32m✓ built in 5.64s[39m
+[16:33:08.032] Installing dependencies...
+[16:33:09.156] 
+[16:33:09.157] up to date in 1s
+[16:33:09.157] 
+[16:33:09.157] 78 packages are looking for funding
+[16:33:09.157]   run `npm fund` for details
+[16:33:09.170] Running "npm run vercel-build"
+[16:33:09.296] 
+[16:33:09.296] > rest-express@1.0.0 vercel-build
+[16:33:09.296] > npm run build
+[16:33:09.297] 
+[16:33:09.424] 
+[16:33:09.425] > rest-express@1.0.0 build
+[16:33:09.425] > vite build && tsc -p tsconfig.server.json
+[16:33:09.425] 
+[16:33:09.682] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[16:33:09.732] transforming...
+[16:33:10.094] Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+[16:33:10.094]   npx update-browserslist-db@latest
+[16:33:10.094]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[16:33:14.686] [32m✓[39m 1730 modules transformed.
+[16:33:15.030] rendering chunks...
+[16:33:15.041] computing gzip size...
+[16:33:15.055] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.47 kB[22m[1m[22m[2m │ gzip:   0.71 kB[22m
+[16:33:15.056] [2m../dist/public/[22m[2massets/[22m[35mindex-CKaqDpxg.css  [39m[1m[2m 68.22 kB[22m[1m[22m[2m │ gzip:  12.08 kB[22m
+[16:33:15.056] [2m../dist/public/[22m[2massets/[22m[36mindex-X71Ghumc.js   [39m[1m[2m408.13 kB[22m[1m[22m[2m │ gzip: 123.96 kB[22m
+[16:33:15.056] [32m✓ built in 5.35s[39m
+[16:33:19.664] Using TypeScript 5.6.3 (local user-provided)
+[16:33:23.853] api/index.ts(4,32): error TS7016: Could not find a declaration file for module '../dist/server/server/routes.js'. '/vercel/path0/dist/server/server/routes.js' implicitly has an 'any' type.
+[16:33:23.853] api/index.ts(20,42): error TS7016: Could not find a declaration file for module '../dist/server/server/vite.js'. '/vercel/path0/dist/server/server/vite.js' implicitly has an 'any' type.
+[16:33:23.853] 
+[16:33:34.301] Build Completed in /vercel/output [43s]
+[16:33:34.627] Deploying outputs...
+[16:33:42.379] Deployment completed
+[16:33:43.168] Creating build cache...

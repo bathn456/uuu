@@ -1,6 +1,8 @@
 // Vercel serverless function entry point
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
+
+// @ts-ignore
 import { registerRoutes } from '../dist/server/server/routes.js';
 
 let app: express.Application;
@@ -17,6 +19,7 @@ async function initApp() {
     await registerRoutes(app);
     
     // Serve static files in production
+    // @ts-ignore
     const { serveStatic } = await import('../dist/server/server/vite.js');
     serveStatic(app);
   }

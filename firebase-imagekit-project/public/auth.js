@@ -54,6 +54,13 @@ class AuthManager {
                 throw new Error('Firebase yapılandırması bulunamadı. firebase-config.js dosyasını kontrol edin.');
             }
 
+            // Check if demo mode
+            if (window.DEMO_MODE) {
+                console.log('DEMO MODE: Firebase Auth simülasyonu aktif');
+                this.initializeDemoAuth();
+                return;
+            }
+
             // Import Firebase modules
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
             const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
@@ -74,6 +81,34 @@ class AuthManager {
             console.error('Firebase Auth initialization failed:', error);
             this.showError('Firebase başlatılamadı: ' + error.message);
         }
+    }
+
+    /**
+     * Initialize demo authentication for testing
+     */
+    initializeDemoAuth() {
+        this.isInitialized = true;
+        this.isDemoMode = true;
+        console.log('Demo Auth initialized - use demo@test.com / demo123 to login');
+        
+        // Show demo mode indicator
+        this.showDemoModeIndicator();
+    }
+
+    /**
+     * Show demo mode indicator
+     */
+    showDemoModeIndicator() {
+        const demoIndicator = document.createElement('div');
+        demoIndicator.innerHTML = `
+            <div style="background: #f59e0b; color: white; padding: 8px; text-align: center; font-size: 14px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+                🧪 DEMO MODU AKTIF - Test için: demo@test.com / demo123
+            </div>
+        `;
+        document.body.insertBefore(demoIndicator, document.body.firstChild);
+        
+        // Adjust body padding to account for demo banner
+        document.body.style.paddingTop = '40px';
     }
 
     /**
@@ -120,6 +155,12 @@ class AuthManager {
         this.hideError();
 
         try {
+            // Demo mode login
+            if (this.isDemoMode) {
+                await this.handleDemoLogin(email, password);
+                return;
+            }
+
             const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
             
             // Sign in user
@@ -160,6 +201,32 @@ class AuthManager {
             this.showError(errorMessage);
         } finally {
             this.setLoading(false);
+        }
+    }
+
+    /**
+     * Handle demo mode login
+     * @param {string} email 
+     * @param {string} password 
+     */
+    async handleDemoLogin(email, password) {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Demo credentials
+        if (email === 'demo@test.com' && password === 'demo123') {
+            // Simulate successful login
+            const mockUser = {
+                email: 'demo@test.com',
+                uid: 'demo-user-123',
+                displayName: 'Demo Admin'
+            };
+            
+            this.currentUser = mockUser;
+            this.handleAuthStateChange(mockUser);
+            this.showToast('Demo giriş başarılı! 🎉', 'success');
+        } else {
+            throw new Error('Demo mode için kullanın: demo@test.com / demo123');
         }
     }
 

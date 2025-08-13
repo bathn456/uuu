@@ -1,0 +1,121 @@
+Gayet iyi soru — promptu veya ortaya çıkacak projeyi incelerken **öncelikle kontrol etmen gereken kritik noktalar** şöyle. Aşağıyı yüksek → orta → düşük öncelik sırasına göre düzenledim; her maddeye kısa kontrol adımı/örnek de ekledim.
+
+# 1 — Güvenlik (Mutlaka kontrol et)
+
+* **Private key sızıntısı yok**
+
+  * Kontrol: `IMAGEKIT_PRIVATE_KEY` yalnızca backend (Firebase Functions) ortam değişkeninde olsun. Frontend kodunda `process.env`/hard-coded anahtar olamaz.
+* **Admin-only Authentication**
+
+  * Kontrol: Firebase Auth kayıtları ve giriş akışı; anonim ya da açık sign-up kapalı mı? Sadece önceden eklenmiş admin hesabı giriş yapabiliyor mu?
+* **Backend endpoint doğrulaması / imzalama**
+
+  * Kontrol: Frontend doğrudan ImageKit `privateKey` ile POST atıyor mu? (Yasak.) Backend, imzalı token/param üretip frontend’e veriyor mu?
+* **CORS & origin kısıtlaması**
+
+  * Kontrol: Functions CORS sadece hosting domain’e izin veriyor mu; ImageKit’in upload allowed origins ayarları uygun mu?
+* **Dosya doğrulama**
+
+  * Kontrol: Backend / frontend dosya türü ve boyutu (MIME) kontrolü yapıyor mu? (Örn. sadece `image/*`, max 5 MB veya senin belirlediğin limit.)
+* **Rate limiting & abuse koruması**
+
+  * Kontrol: Upload endpoint için rate limiting veya upload quota (kullanıcı/admin başına günlük/aylık limit) var mı?
+
+# 2 — Free-tier / Maliyet & Kota (Çok önemli)
+
+* **Kota sınırları tanımlı mı**
+
+  * Kontrol: Admin panelde / kodda kullanıcı-başına ve genel aylık sınır var mı? (ImageKit 20 GB, Firebase hosting limitleri vb.)
+* **Otomatik optimizasyon parametreleri**
+
+  * Kontrol: Tarayıcıda resize + WebP dönüşümü uygulandığında ortalama dosya boyutu tahmini test edildi mi?
+* **Monitoring uyarısı**
+
+  * Kontrol: Usage (ImageKit ve Firebase) için uyarı/monitoring önerisi README’de var mı? (Manuel kontrol veya e-posta uyarısı önerisi)
+
+# 3 — Veri akışı & işlevsellik
+
+* **Yükleme akışı doğru mu?**
+
+  * Kontrol adımları:
+
+    1. Frontend dosya seçer → canvas resize → WebP dönüşümü → POST backend auth isteği → backend imzalar → frontend ImageKit’e upload/yönlendirir.
+    2. Test: Yetkisiz kullanıcı upload yapamıyor mu?
+* **Önizleme (preview)**
+
+  * Kontrol: Büyük dosyalar için tarayıcıda hızlı preview kullanılıyor mu (object URL / data URL) — gerçek upload öncesi?
+* **Thumbnail / Orijinal ayrımı**
+
+  * Kontrol: Liste/galeri küçük resim (thumbnail) kullanıyor, tıklayınca CDN üzerinden büyük versiyon mu geliyor?
+
+# 4 — Performans ve CDN / Cache (Optimize edilmesi gereken)
+
+* **cache-control başlıkları**
+
+  * Kontrol: `cache-control: max-age=31536000, immutable` gibi uzun önbellek header’ları ImageKit/hosting response’larında yer alıyor mu? (firebase.json hosting headers kontrolü)
+* **Lazy-loading**
+
+  * Kontrol: `<img loading="lazy">` veya JS lazy-loading uygulanmış mı?
+* **Dosya boyutu hedefi**
+
+  * Kontrol: Resize ayarları (max 1080px) ve WebP kalite (örn. %80) uygulanıp test edilerek hedef ortalama KB sağlanmış mı?
+
+# 5 — Güvenlik başlıkları ve uygulama sertliği (ek)
+
+* **HTTPS zorunlu** — tüm endpointler HTTPS olmalı.
+* **Content Security Policy (CSP)** — sadece beklenen kaynaklara izin verilsin (hosting domain + ImageKit CDN).
+* **X-Content-Type-Options** ve **X-Frame-Options** gibi temel header’lar kontrol edilmeli.
+
+# 6 — Deployment / Config kontrolü
+
+* **Environment secrets**
+
+  * Kontrol: Replit ve Firebase Functions için tüm anahtarlar secrets/env olarak eklendi mi? (Replit Secrets, Firebase `functions:config:set`)
+* **firebase.json**
+
+  * Kontrol: `headers` içinde caching ve security header’ları yazılı mı? (örnek: `headers` → `Cache-Control`)
+* **Functions bölgesi ve cold start**
+
+  * Kontrol: Fonksiyonlar uygun bölgeye deploy edilmiş mi? (Kullanıcılara yakın, cold-start toleransı göz önünde)
+
+# 7 — Hata yönetimi & UX
+
+* **Kullanıcı bildirimleri**
+
+  * Kontrol: Yükleme sırasında progress bar, başarı/başarısız bildirimleri, hatalı dosya uyarıları var mı?
+* **Retry ve timeout**
+
+  * Kontrol: Ağ hatalarında mantıklı retry politikası ve timeout var mı?
+
+# 8 — Test & gözden geçirme
+
+* **Fonksiyonel testler**
+
+  * Kontrol: yetkili kullanıcı upload yapabiliyor, yetkisiz yapamıyor, büyük dosya reddediliyor, CORS kapalıyken istekler reddediliyor.
+* **Penetrasyon basit testleri**
+
+  * Kontrol: frontend üzerinden `privateKey` sızdırma denemesi, doğrudan ImageKit’e key ile POST denemesi yapılarak test.
+* **Load/usage öngörüsü**
+
+  * Kontrol: Bir hafta/aylık öngörüyle tahmini trafik hesaplanıp free tier’a uygunluğu doğrula.
+
+# 9 — Dokümantasyon (README) — mutlaka olmalı
+
+* **Adımlar**: Replit çalıştırma, firebase deploy, admin ekleme, env değişkenleri nasıl eklenir.
+* **Kota kısıtlamaları**: Hangi limitlerin nerede olduğu ve nasıl izleneceği yazılı olsun.
+* **Rollback / hata senaryoları**: Eğer upload kotası aşılırsa ya da anahtar sızarsa ne yapılmalı.
+
+---
+
+## Hızlı kontrol komutları / kısa testler
+
+* Env kontrol (local/fn): `echo $IMAGEKIT_PRIVATE_KEY` (görünmemeli; Replit/Fn konsolunda kontrol)
+* Firebase config kontrol: `firebase functions:config:get`
+* CORS test (curl):
+  `curl -I -X OPTIONS https://<function-url> -H "Origin: https://senin-site.firebaseapp.com"` — beklenen: 200 + doğru Access-Control-Allow-Origin
+* Cache header kontrol (örnek):
+  `curl -I https://<imagekit-image-url>` → `Cache-Control` değerini gör
+
+---
+
+Eğer istersen, bu kontrol listesinden bir **test checklist (.md)** dosyası oluşturup README’ye ekleyecek şekilde hazırlarım — Replit’e direkt koyabileceğin adım/adım test talimatlarıyla birlikte. Hazır mısın onu oluşturmam için?

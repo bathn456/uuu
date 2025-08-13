@@ -223,6 +223,11 @@ class PhotoUploader {
      * @returns {Promise<Object>}
      */
     async getImageKitAuth(idToken) {
+        // Demo mode authentication
+        if (window.DEMO_MODE) {
+            return this.getDemoImageKitAuth();
+        }
+
         const response = await fetch(window.imagekitConfig.authenticationEndpoint, {
             method: 'GET',
             headers: {
@@ -239,11 +244,31 @@ class PhotoUploader {
     }
 
     /**
+     * Get demo ImageKit authentication
+     * @returns {Promise<Object>}
+     */
+    async getDemoImageKitAuth() {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        return {
+            signature: 'demo-signature-' + Date.now(),
+            expire: Math.floor(Date.now() / 1000) + 3600,
+            token: 'demo-token-' + Math.random().toString(36).substring(7)
+        };
+    }
+
+    /**
      * Upload file to ImageKit
      * @param {Object} authData 
      * @returns {Promise<Object>}
      */
     async uploadToImageKit(authData) {
+        // Demo mode upload simulation
+        if (window.DEMO_MODE) {
+            return this.simulateDemoUpload();
+        }
+
         const formData = new FormData();
         
         // Add file
@@ -302,6 +327,35 @@ class PhotoUploader {
             xhr.open('POST', 'https://upload.imagekit.io/api/v1/files/upload');
             xhr.send(formData);
         });
+    }
+
+    /**
+     * Simulate demo upload for testing
+     * @returns {Promise<Object>}
+     */
+    async simulateDemoUpload() {
+        // Simulate upload progress
+        for (let i = 20; i <= 90; i += 10) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            this.updateProgress(i, 'Demo yükleme simülasyonu...');
+        }
+
+        // Final delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Create demo result with blob URL for preview
+        const demoUrl = URL.createObjectURL(this.optimizedFile);
+        
+        return {
+            url: demoUrl,
+            name: this.optimizedFile.name,
+            size: this.optimizedFile.size,
+            fileId: 'demo-file-' + Date.now(),
+            filePath: '/demo/uploads/' + this.optimizedFile.name,
+            width: 1080, // Assume optimized dimensions
+            height: 720,
+            isDemo: true
+        };
     }
 
     /**

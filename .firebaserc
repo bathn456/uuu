@@ -1,14 +1,5 @@
 {
   "projects": {
-    "default": "deep-learning-platform"
-  },
-  "targets": {
-    "deep-learning-platform": {
-      "hosting": {
-        "production": [
-          "deep-learning-platform"
-        ]
-      }
-    }
+    "default": "batuhanyilmazdeeplearnin-d6442"
   }
 }

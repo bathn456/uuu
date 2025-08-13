@@ -1,0 +1,20 @@
+{
+  "name": "firebase-imagekit-uploader",
+  "version": "1.0.0",
+  "description": "Firebase Hosting + ImageKit Storage entegrasyonlu fotoğraf yükleme uygulaması",
+  "main": "functions/index.js",
+  "scripts": {
+    "dev": "firebase emulators:start --only functions",
+    "build": "cd functions && npm run build",
+    "deploy:functions": "firebase deploy --only functions",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy": "firebase deploy",
+    "serve": "firebase serve"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  },
+  "engines": {
+    "node": "18"
+  }
+}

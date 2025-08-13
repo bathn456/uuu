@@ -47,10 +47,13 @@ class ImageOptimizer {
                     canvas.width = width;
                     canvas.height = height;
 
-                    // Draw image with high quality
+                    // Draw image with high quality (EXIF data automatically stripped)
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Note: Canvas automatically removes EXIF data during redraw
+                    optimizations.push('Meta veriler temizlendi (EXIF, GPS vb.)');
 
                     // Determine output format and quality
                     const outputFormat = this.getOptimalFormat(file.type);

@@ -1,0 +1,144 @@
+Harika — aşağıda **önceki listeye ek olarak** mutlaka varlığını/ doğru çalıştığını kontrol etmen gereken ek maddeleri gruplayıp kısa doğrulama adımlarıyla verdim. Kısa ve uygulanabilir tutmaya çalıştım — istersen bunları bir `.md` checklist’e dönüştürüp README’e ekleyeyim.
+
+# 1 — Kimlik & Erişim Derin Kontrolleri
+
+* **Admin hesabı sertliği**
+
+  * 2FA etkin mi? (Firebase destekliyorsa ek güvenlik)
+  * Parola politikası güçlü mü (uzunluk, karmaşıklık)?
+* **Yetki modeli**
+
+  * Admin rolü Firebase custom claim ile mi veriliyor? (role bazlı kontrol her endpointte kontrol ediliyor mu)
+* **Oturum Yönetimi**
+
+  * ID token süreleri ve refresh akışı doğru mı?
+  * Cookie’ler `Secure`, `HttpOnly`, `SameSite` ayarlı mı?
+
+# 2 — Gizlilik & Yasal Uyum
+
+* **Kişisel veri sızıntısı**
+
+  * Loglar veya hata mesajları PII (kullanıcı e-posta, IP vb.) içermiyor mu?
+* **Veri saklama / silme süreçleri**
+
+  * Kullanıcı silme isteğinde görseller nasıl siliniyor? (soft-delete / permanent)
+* **GDPR/KVKK gereksinimleri**
+
+  * Veri erişim/silme taleplerine cevap prosedürü var mı?
+
+# 3 — Dosya Güvenliği & İçerik Denetimi
+
+* **Dosya türü kısıtlaması**
+
+  * SVG yüklemeye izin veriliyorsa sanitizasyon var mı? (SVG XSS riski)
+* **MIME ve içerik doğrulama**
+
+  * Backend gerçek MIME’ı kontrol ediyor mu (sadece extension’e bakmak yetmez)?
+* **EXIF/meta veri temizliği**
+
+  * Konum veya hassas meta veriler upload’dan önce siliniyor mu?
+* **Virus / Malware tarama**
+
+  * (Opsiyonel) kötü amaçlı içerik taraması (ör. 3rd-party virus scan) var mı?
+
+# 4 — Operasyon & İzlenebilirlik
+
+* **Loglama**
+
+  * Upload success/fail, auth fail, quota exceed gibi olaylar loglanıyor mu?
+  * Loglar güvenli yerde saklanıyor mu (sensitive veri yok)?
+* **Error monitoring**
+
+  * Sentry/LogRocket/Stackdriver gibi hata izleme entegre mi?
+* **Usage metrikleri & uyarılar**
+
+  * ImageKit ve Firebase için kullanım/limit uyarıları (e-posta veya webhook) kurulu mu?
+* **Webhook’lar**
+
+  * ImageKit webhook’ları (upload/delete) dinleniyor ve doğrulanıyor mu?
+
+# 5 — Yedekleme & Kurtarma
+
+* **Export / yedekleme**
+
+  * Kritik görsellerin periyodik yedeği var mı (örn. başka bir bucket’a)?
+* **Geri alma (rollback)**
+
+  * Yanlışlıkla silinen dosya için geri alma süreci tanımlı mı?
+
+# 6 — Performans & Ölçeklenebilirlik Ek Kontrolleri
+
+* **Soğuk start & fonksiyon latency**
+
+  * Firebase Functions için cold-start toleransı test edildi mi?
+* **Rate limiting**
+
+  * Admin endpoint’ine brute-force / flood saldırılarına karşı rate limit var mı?
+* **Load testing**
+
+  * Basit bir yük testiyle (ör. 100 eşzamanlı upload / istek) sistem nasıl davranıyor?
+
+# 7 — Ağ & Güvenlik Başlıkları
+
+* **HSTS** (Strict-Transport-Security) header var mı?
+* **CSP** (Content Security Policy) doğru ve sıkı mı?
+* **SRI** (Subresource Integrity) üçüncü parti scriptler için kullanılıyor mu?
+
+# 8 — Üçüncü Parti / Bağımlılık Kontrolleri
+
+* **Dependency vulnerabilities**
+
+  * `npm audit` / `yarn audit` düzenli çalıştırılıyor mu?
+  * `package-lock.json`/`yarn.lock` kontrol ediliyor mu?
+* **Licence compliance**
+
+  * Kullanılan paketlerin lisansları uygun mu (örn. copyleft riskleri)?
+
+# 9 — UI / UX & Erişilebilirlik
+
+* **A11y (erişilebilirlik)**
+
+  * Form etiketleri, keyboard erişimi, ARIA rolleri kontrol edildi mi?
+* **Responsive & cross-browser**
+
+  * Mobilde büyük resim yüklemeleri nasıl davranıyor? (mobil veri kullanımını minimize et)
+* **Hata/başarı durumları**
+
+  * Kullanıcıya net geri bildirim, retry yolu ve hata kodları gösteriliyor mu?
+
+# 10 — CI / CD / Config Yönetimi
+
+* **Secrets yönetimi**
+
+  * Replit/Firebase secrets doğru yerde mi; git repo’da yok mu?
+* **Staging ortamı**
+
+  * Canlıya push etmeden önce staging ortamında test yapılıyor mu?
+* **Automated tests**
+
+  * En azından upload akışı için end-to-end testi var mı?
+
+# 11 — Operasyonel Politikalar & Sınırlar
+
+* **Quota yönetimi**
+
+  * Admin için günlük/aylık upload limiti uygulanmış mı? (otomatik kilitleme veya uyarı)
+* **Cost cap / billing alert**
+
+  * Google Cloud billing alert veya ImageKit cost alert kurulmuş mu?
+
+# Hızlı “var mı?” kontrol checklist (kopyala-yapıştır)
+
+* Private key frontend’de yok ✅
+* Admin-only login + 2FA? ✅/❌
+* Rate limiting var mı? ✅/❌
+* MIME + size + SVG sanitization? ✅/❌
+* EXIF temizleme? ✅/❌
+* Loglama + Sentry entegre? ✅/❌
+* Usage alerts (ImageKit/Firebase) kurulu mu? ✅/❌
+* Secrets git’te yok mu? ✅/❌
+* Backup plan var mı? ✅/❌
+
+---
+
+İstersen bu maddelerden otomatik testleri ve kontrol komutlarını içeren **README’ye eklenmiş bir “Pre-deploy Checklist”** veya CI iş akışı (GitHub Action) hazırlayayım — örn. `npm run audit`, `npm run e2e-upload-test`, `curl` ile CORS ve header testleri. Hangisini istersin, checklist mi yoksa CI şablonu mu hazır olayım?

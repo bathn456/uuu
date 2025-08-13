@@ -82,6 +82,16 @@ class PhotoUploader {
             return;
         }
 
+        // Security validation
+        if (window.SecurityUtils) {
+            const validation = window.SecurityUtils.validateFileUpload(file);
+            if (!validation.isValid) {
+                this.showToast(validation.errors.join(', '), 'error');
+                this.clearSelection();
+                return;
+            }
+        }
+
         try {
             this.selectedFile = file;
             this.showFileInfo(file);

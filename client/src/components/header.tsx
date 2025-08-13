@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Settings, Github, Linkedin, Mail } from 'lucide-react';
+import { Settings, Github, Linkedin, Mail, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -88,6 +88,21 @@ export function Header() {
               <Mail className="w-4 h-4" />
             </a>
 
+            {/* Admin Section */}
+            {isAdmin && (
+              <Link href="/imagekit">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex mr-2"
+                  data-testid="button-imagekit"
+                >
+                  <Cloud className="w-4 h-4 mr-2" />
+                  ImageKit
+                </Button>
+              </Link>
+            )}
+            
             {/* Admin Button */}
             {isAdmin ? (
               <Button

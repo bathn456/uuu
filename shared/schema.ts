@@ -49,6 +49,11 @@ export const files = pgTable("files", {
   category: text("category").notNull(), // 'algorithm' or 'project'
   relatedId: varchar("related_id"), // algorithm id or project id
   uploadedBy: text("uploaded_by").notNull().default("admin"),
+  // ImageKit fields
+  imagekitFileId: text("imagekit_file_id"), // ImageKit file ID for cloud storage
+  imagekitUrl: text("imagekit_url"), // ImageKit optimized URL
+  imagekitThumbnailUrl: text("imagekit_thumbnail_url"), // Thumbnail URL from ImageKit
+  isImagekitStored: integer("is_imagekit_stored").notNull().default(0), // 0 = local, 1 = ImageKit
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

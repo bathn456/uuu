@@ -171,6 +171,11 @@ export class MemStorage implements IStorage {
       relatedId: insertFile.relatedId || null,
       uploadedBy: "admin",
       createdAt: new Date(),
+      // ImageKit fields with defaults
+      imagekitFileId: insertFile.imagekitFileId || null,
+      imagekitUrl: insertFile.imagekitUrl || null,
+      imagekitThumbnailUrl: insertFile.imagekitThumbnailUrl || null,
+      isImagekitStored: insertFile.isImagekitStored || 0,
     };
     this.files.set(id, file);
     return file;

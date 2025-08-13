@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AdminProvider } from "@/components/admin-provider";
 import Home from "@/pages/home";
+import ImageKitPage from "@/pages/imagekit";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/algorithms" component={Home} />
       <Route path="/projects" component={Home} />
+      <Route path="/imagekit" component={ImageKitPage} />
       <Route component={NotFound} />
     </Switch>
   );

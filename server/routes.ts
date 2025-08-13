@@ -7,6 +7,7 @@ import path from "path";
 import { z } from "zod";
 import rateLimit from 'express-rate-limit';
 import { AdminAuth, requireAdmin, securityHeaders, AuthenticatedRequest, loginRateLimit } from "./auth.js";
+import ImageKitService from "./imagekit-service.js";
 
 // Configure multer for file uploads with high quality settings
 const upload = multer({
@@ -235,15 +236,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const fileData = {
-        fileName: req.file.filename, // This is the hashed filename
-        originalName: req.file.originalname, // This is the original filename
+      // Check if ImageKit is configured and should be used
+      const useImageKit = ImageKitService.isConfigured() && (req.body.useImageKit === 'true' || req.body.useImageKit === true);
+      
+      let fileData: any = {
+        fileName: req.file.filename,
+        originalName: req.file.originalname,
         fileType: req.file.mimetype,
         fileSize: req.file.size,
         filePath: req.file.path,
         category: req.body.category || 'general',
         relatedId: req.body.relatedId || null,
+        isImagekitStored: 0
       };
+
+      // Upload to ImageKit if configured and requested
+      if (useImageKit) {
+        try {
+          const imagekitResult = await ImageKitService.uploadLocalFile(req.file.path, {
+            fileName: req.file.originalname,
+            folder: `/deep-learning-platform/${req.body.category || 'general'}`,
+            tags: [req.body.category || 'general', 'uploaded-file']
+          });
+
+          fileData = {
+            ...fileData,
+            isImagekitStored: 1,
+            imagekitFileId: imagekitResult.fileId,
+            imagekitUrl: imagekitResult.url,
+            imagekitThumbnailUrl: imagekitResult.thumbnailUrl
+          };
+
+          console.log('File uploaded to ImageKit successfully:', imagekitResult.url);
+        } catch (imagekitError) {
+          console.error('ImageKit upload failed, falling back to local storage:', imagekitError);
+          // Continue with local storage if ImageKit fails
+        }
+      }
 
       const validatedData = insertFileSchema.parse(fileData);
       const file = await storage.createFile(validatedData);
@@ -252,6 +281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid data", errors: error.errors });
       }
+      console.error('File upload error:', error);
       res.status(500).json({ message: "Failed to upload file" });
     }
   });
@@ -319,7 +349,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           category: content.category,
           relatedId: content.algorithmId,
           originalName: content.title,
-          uploadedBy: 'admin'
+          uploadedBy: 'admin',
+          imagekitFileId: null,
+          imagekitUrl: null,
+          imagekitThumbnailUrl: null,
+          isImagekitStored: 0
         };
         filePath = path.join(process.cwd(), 'uploads', content.fileName);
         originalName = content.title; // Use title as original name for algorithm content
@@ -482,6 +516,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete note" });
+    }
+  });
+
+  // ImageKit routes
+  app.get("/api/imagekit/auth", requireAdmin, (req, res) => {
+    try {
+      if (!ImageKitService.isConfigured()) {
+        return res.status(503).json({ 
+          error: "ImageKit is not configured",
+          configured: false
+        });
+      }
+
+      const authParams = ImageKitService.getAuthParams();
+      res.json({
+        ...authParams,
+        configured: true,
+        publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+        urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
+      });
+    } catch (error) {
+      console.error('ImageKit auth error:', error);
+      res.status(500).json({ error: "Failed to generate ImageKit auth" });
+    }
+  });
+
+  app.post("/api/imagekit/upload", requireAdmin, upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      if (!ImageKitService.isConfigured()) {
+        return res.status(503).json({ error: "ImageKit is not configured" });
+      }
+
+      const uploadResult = await ImageKitService.uploadLocalFile(req.file.path, {
+        fileName: req.file.originalname,
+        folder: `/deep-learning-platform/${req.body.folder || 'uploads'}`,
+        tags: req.body.tags ? req.body.tags.split(',') : ['upload'],
+        useUniqueFileName: true
+      });
+
+      // Clean up local file after successful upload
+      try {
+        require('fs').unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        console.warn('Failed to cleanup local file:', cleanupError);
+      }
+
+      res.json(uploadResult);
+    } catch (error) {
+      console.error('ImageKit upload error:', error);
+      res.status(500).json({ error: "Failed to upload to ImageKit" });
+    }
+  });
+
+  app.get("/api/imagekit/optimize/:path(*)", (req, res) => {
+    try {
+      if (!ImageKitService.isConfigured()) {
+        return res.status(503).json({ error: "ImageKit is not configured" });
+      }
+
+      const filePath = req.params.path;
+      const { width, height, quality, format } = req.query;
+
+      const optimizedUrl = ImageKitService.getOptimizedUrl(`/${filePath}`, {
+        width: width ? parseInt(width as string) : undefined,
+        height: height ? parseInt(height as string) : undefined,
+        quality: quality ? parseInt(quality as string) : undefined,
+        format: format as any
+      });
+
+      res.redirect(optimizedUrl);
+    } catch (error) {
+      console.error('ImageKit optimization error:', error);
+      res.status(500).json({ error: "Failed to generate optimized URL" });
+    }
+  });
+
+  app.delete("/api/imagekit/:fileId", requireAdmin, async (req, res) => {
+    try {
+      if (!ImageKitService.isConfigured()) {
+        return res.status(503).json({ error: "ImageKit is not configured" });
+      }
+
+      await ImageKitService.deleteFile(req.params.fileId);
+      res.status(204).send();
+    } catch (error) {
+      console.error('ImageKit delete error:', error);
+      res.status(500).json({ error: "Failed to delete from ImageKit" });
+    }
+  });
+
+  app.get("/api/imagekit/files", requireAdmin, async (req, res) => {
+    try {
+      if (!ImageKitService.isConfigured()) {
+        return res.status(503).json({ error: "ImageKit is not configured" });
+      }
+
+      const { skip, limit, search, folder } = req.query;
+      const files = await ImageKitService.listFiles({
+        skip: skip ? parseInt(skip as string) : 0,
+        limit: limit ? parseInt(limit as string) : 20,
+        searchQuery: search as string,
+        folder: folder as string
+      });
+
+      res.json(files);
+    } catch (error) {
+      console.error('ImageKit list files error:', error);
+      res.status(500).json({ error: "Failed to list ImageKit files" });
     }
   });
 

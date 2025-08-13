@@ -1,9 +1,7 @@
-import * as functions from 'firebase-functions';
+import { onRequest } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
-import * as express from 'express';
-import * as cors from 'cors';
-import * as multer from 'multer';
-import ImageKit from 'imagekit';
+import express from 'express';
+import cors from 'cors';
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -11,256 +9,172 @@ admin.initializeApp();
 // Initialize Express app
 const app = express();
 
+// Trust proxy for Firebase Functions
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// Body parsing middleware
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb", parameterLimit: 10000 }));
+
 // CORS configuration
 app.use(cors({
   origin: true,
   credentials: true
 }));
 
-// Initialize ImageKit
-const imagekit = new ImageKit({
-  publicKey: functions.config().imagekit?.public_key || process.env.IMAGEKIT_PUBLIC_KEY || '',
-  privateKey: functions.config().imagekit?.private_key || process.env.IMAGEKIT_PRIVATE_KEY || '',
-  urlEndpoint: functions.config().imagekit?.url_endpoint || process.env.IMAGEKIT_URL_ENDPOINT || ''
-});
-
-// Configure multer for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit for Firebase Functions
-    files: 5
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-      'image/svg+xml', 'image/bmp', 'image/tiff',
-      'video/mp4', 'video/webm', 'video/ogg',
-      'application/pdf', 'text/plain'
-    ];
-    
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('File type not supported'), false);
-    }
-  }
-});
-
-// Security middleware
-app.use((req, res, next) => {
-  // Security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  
-  next();
-});
-
-// ImageKit authentication endpoint
-app.get('/imagekit-auth', async (req, res) => {
-  try {
-    // Verify Firebase Auth token
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    if (!decodedToken.admin) {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    // Generate ImageKit authentication parameters
-    const authParams = imagekit.getAuthenticationParameters();
-    
-    res.json({
-      ...authParams,
-      publicKey: imagekit.options.publicKey,
-      urlEndpoint: imagekit.options.urlEndpoint,
-      configured: !!(imagekit.options.publicKey && imagekit.options.privateKey && imagekit.options.urlEndpoint)
-    });
-  } catch (error) {
-    console.error('ImageKit auth error:', error);
-    res.status(500).json({ error: 'Authentication failed' });
-  }
-});
-
-// ImageKit upload endpoint
-app.post('/imagekit-upload', upload.single('file'), async (req, res) => {
-  try {
-    // Verify Firebase Auth token
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    if (!decodedToken.admin) {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' });
-    }
-
-    // Upload to ImageKit
-    const uploadResponse = await imagekit.upload({
-      file: req.file.buffer,
-      fileName: req.file.originalname,
-      folder: `/deep-learning-platform/${req.body.folder || 'uploads'}`,
-      useUniqueFileName: true,
-      tags: req.body.tags ? req.body.tags.split(',') : ['firebase-upload'],
-      transformation: {
-        pre: 'l-text,i-Deep Learning Platform,fs-16,l-end',
-        post: []
-      }
-    });
-
-    // Store metadata in Firestore
-    await admin.firestore().collection('files').add({
-      imagekitFileId: uploadResponse.fileId,
-      fileName: uploadResponse.name,
-      originalName: req.file.originalname,
-      url: uploadResponse.url,
-      thumbnailUrl: uploadResponse.thumbnailUrl,
-      size: uploadResponse.size,
-      height: uploadResponse.height,
-      width: uploadResponse.width,
-      filePath: uploadResponse.filePath,
-      tags: uploadResponse.tags,
-      uploadedAt: admin.firestore.FieldValue.serverTimestamp(),
-      uploadedBy: decodedToken.uid
-    });
-
-    res.json({
-      fileId: uploadResponse.fileId,
-      name: uploadResponse.name,
-      url: uploadResponse.url,
-      thumbnailUrl: uploadResponse.thumbnailUrl,
-      height: uploadResponse.height,
-      width: uploadResponse.width,
-      size: uploadResponse.size,
-      filePath: uploadResponse.filePath,
-      tags: uploadResponse.tags
-    });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Upload failed' });
-  }
-});
-
-// Get optimized image URL
-app.get('/optimize-image', (req, res) => {
-  try {
-    const { path: imagePath, width, height, quality, format } = req.query;
-    
-    if (!imagePath) {
-      return res.status(400).json({ error: 'Image path is required' });
-    }
-
-    const transformation = [];
-    if (width) transformation.push(`w-${width}`);
-    if (height) transformation.push(`h-${height}`);
-    if (quality) transformation.push(`q-${quality}`);
-    if (format) transformation.push(`f-${format}`);
-
-    const optimizedUrl = imagekit.url({
-      path: imagePath as string,
-      transformation: transformation
-    });
-
-    res.redirect(optimizedUrl);
-  } catch (error) {
-    console.error('Optimization error:', error);
-    res.status(500).json({ error: 'Optimization failed' });
-  }
-});
-
-// List files from ImageKit
-app.get('/imagekit-files', async (req, res) => {
-  try {
-    // Verify Firebase Auth token
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    if (!decodedToken.admin) {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    const { skip = '0', limit = '20', search, folder } = req.query;
-
-    const files = await imagekit.listFiles({
-      skip: parseInt(skip as string),
-      limit: parseInt(limit as string),
-      searchQuery: search as string,
-      path: folder as string
-    });
-
-    res.json(files);
-  } catch (error) {
-    console.error('List files error:', error);
-    res.status(500).json({ error: 'Failed to list files' });
-  }
-});
-
-// Delete file from ImageKit
-app.delete('/imagekit-file/:fileId', async (req, res) => {
-  try {
-    // Verify Firebase Auth token
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    if (!decodedToken.admin) {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    const { fileId } = req.params;
-
-    // Delete from ImageKit
-    await imagekit.deleteFile(fileId);
-
-    // Delete metadata from Firestore
-    const filesRef = admin.firestore().collection('files');
-    const snapshot = await filesRef.where('imagekitFileId', '==', fileId).get();
-    
-    const batch = admin.firestore().batch();
-    snapshot.docs.forEach(doc => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
-
-    res.status(204).send();
-  } catch (error) {
-    console.error('Delete error:', error);
-    res.status(500).json({ error: 'Delete failed' });
-  }
-});
-
-// Health check endpoint
+// Basic routes for your deep learning platform
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    imagekit: !!(imagekit.options.publicKey && imagekit.options.privateKey),
     version: '1.0.0'
   });
 });
 
+// Admin authentication endpoint
+app.post('/api/auth/admin/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Simple admin check (you should implement proper authentication)
+    if (email === 'admin@example.com' && password === 'batu4567_%%') {
+      const token = 'admin-token-' + Date.now();
+      res.json({ 
+        success: true, 
+        token,
+        message: 'Admin login successful'
+      });
+    } else {
+      res.status(401).json({ 
+        success: false, 
+        message: 'Invalid credentials' 
+      });
+    }
+  } catch (error) {
+    console.error('Auth error:', error);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+});
+
+// Get algorithms endpoint
+app.get('/api/algorithms', async (req, res) => {
+  try {
+    // Get algorithms from Firestore
+    const snapshot = await admin.firestore().collection('algorithms').get();
+    const algorithms = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    res.json(algorithms);
+  } catch (error) {
+    console.error('Error fetching algorithms:', error);
+    res.status(500).json({ error: 'Failed to fetch algorithms' });
+  }
+});
+
+// Create algorithm endpoint
+app.post('/api/algorithms', async (req, res) => {
+  try {
+    const algorithmData = req.body;
+    const docRef = await admin.firestore().collection('algorithms').add({
+      ...algorithmData,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    res.json({ 
+      id: docRef.id, 
+      ...algorithmData,
+      message: 'Algorithm created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating algorithm:', error);
+    res.status(500).json({ error: 'Failed to create algorithm' });
+  }
+});
+
+// Delete algorithm endpoint
+app.delete('/api/algorithms/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await admin.firestore().collection('algorithms').doc(id).delete();
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting algorithm:', error);
+    res.status(500).json({ error: 'Failed to delete algorithm' });
+  }
+});
+
+// Get projects endpoint
+app.get('/api/projects', async (req, res) => {
+  try {
+    const snapshot = await admin.firestore().collection('projects').get();
+    const projects = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    res.json(projects);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    res.status(500).json({ error: 'Failed to fetch projects' });
+  }
+});
+
+// Create project endpoint
+app.post('/api/projects', async (req, res) => {
+  try {
+    const projectData = req.body;
+    const docRef = await admin.firestore().collection('projects').add({
+      ...projectData,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    
+    res.json({ 
+      id: docRef.id, 
+      ...projectData,
+      message: 'Project created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).json({ error: 'Failed to create project' });
+  }
+});
+
+// Delete project endpoint
+app.delete('/api/projects/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await admin.firestore().collection('projects').doc(id).delete();
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    res.status(500).json({ error: 'Failed to delete project' });
+  }
+});
+
+// Files endpoints (using Firestore for metadata and local/cloud storage)
+app.get('/api/files', async (req, res) => {
+  try {
+    const snapshot = await admin.firestore().collection('files').get();
+    const files = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    res.json(files);
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    res.status(500).json({ error: 'Failed to fetch files' });
+  }
+});
+
 // Export the Express app as a Firebase Function
-export const api = functions
-  .runWith({
-    memory: '1GB',
-    timeoutSeconds: 540,
-    maxInstances: 10
-  })
-  .https.onRequest(app);
+export const api = onRequest({
+  memory: '1GiB',
+  timeoutSeconds: 540,
+  maxInstances: 10
+}, app);

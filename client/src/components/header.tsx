@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 export function Header() {
   const [location] = useLocation();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { isAdmin, login, logout } = useAdmin();
   const { toast } = useToast();
@@ -20,6 +21,7 @@ export function Header() {
     if (result.success) {
       toast({ title: "Admin access granted" });
       setIsLoginOpen(false);
+      setEmail('');
       setPassword('');
     } else {
       toast({ 
@@ -111,6 +113,17 @@ export function Header() {
                     <DialogTitle>Admin Login</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="admin-email">Email</Label>
+                      <Input
+                        id="admin-email"
+                        type="email"
+                        placeholder="ybatu42@gmail.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        data-testid="input-admin-email"
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="password">Password</Label>
                       <Input

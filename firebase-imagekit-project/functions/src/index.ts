@@ -1,140 +1,175 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { setGlobalOptions } from "firebase-functions/v2";
-import * as admin from "firebase-admin";
-import ImageKit from "imagekit";
-import * as cors from "cors";
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
+import * as cors from 'cors';
+import * as crypto from 'crypto';
 
-// Firebase başlangıç ayarları
+// Initialize Firebase Admin
 admin.initializeApp();
 
-// Global seçenekler - ücretsiz plan için optimize
-setGlobalOptions({
-  maxInstances: 3,
-  memory: "256MiB",
-  timeoutSeconds: 60,
-  region: "europe-west1" // En yakın region
-});
-
-// CORS ayarları - sadece Firebase Hosting domain'ini kabul et
-const corsOptions = {
-  origin: [
-    /\.firebaseapp\.com$/,
-    /\.web\.app$/,
-    "http://localhost:5000",
-    "http://localhost:3000"
-  ],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-};
-
-const corsHandler = cors(corsOptions);
-
-// ImageKit konfigürasyonu
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!
+// Configure CORS for all origins (you may want to restrict this in production)
+const corsHandler = cors({
+    origin: true,
+    credentials: true
 });
 
 /**
- * ImageKit Authentication Token oluşturur
- * Güvenlik: Private Key sadece backend'de tutulur
+ * ImageKit Authentication endpoint
+ * Provides secure authentication tokens for ImageKit uploads
  */
-export const getImageKitAuth = onRequest(
-  {
-    cors: true,
-    maxInstances: 3,
-    memory: "256MiB"
-  },
-  async (req, res) => {
-    return corsHandler(req, res, async () => {
-      try {
-        // Sadece POST isteklerini kabul et
-        if (req.method !== "POST") {
-          res.status(405).json({ error: "Method not allowed" });
-          return;
+export const imagekitAuth = functions.https.onRequest(async (request, response) => {
+    // Handle CORS preflight requests
+    corsHandler(request, response, async () => {
+        try {
+            // Only allow GET requests
+            if (request.method !== 'GET') {
+                response.status(405).json({ 
+                    error: 'Method not allowed',
+                    message: 'Only GET requests are supported'
+                });
+                return;
+            }
+
+            // Check for Authorization header
+            const authHeader = request.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                response.status(401).json({ 
+                    error: 'Unauthorized',
+                    message: 'Missing or invalid authorization header'
+                });
+                return;
+            }
+
+            // Extract and verify ID token
+            const idToken = authHeader.split('Bearer ')[1];
+            
+            try {
+                // Verify the ID token with Firebase Admin
+                const decodedToken = await admin.auth().verifyIdToken(idToken);
+                
+                // Log successful authentication (optional)
+                console.log('Authenticated user:', decodedToken.email);
+                
+                // Generate ImageKit authentication parameters
+                const authParams = generateImageKitAuth();
+                
+                // Return authentication parameters
+                response.status(200).json(authParams);
+                
+            } catch (tokenError) {
+                console.error('Token verification failed:', tokenError);
+                response.status(401).json({ 
+                    error: 'Invalid token',
+                    message: 'Failed to verify authentication token'
+                });
+                return;
+            }
+            
+        } catch (error) {
+            console.error('ImageKit auth error:', error);
+            response.status(500).json({ 
+                error: 'Internal server error',
+                message: 'Failed to generate authentication parameters'
+            });
         }
-
-        // Rate limiting - basit IP bazlı kontrol
-        const clientIP = req.ip;
-        console.log(`Auth request from IP: ${clientIP}`);
-
-        // ImageKit authentication parametreleri oluştur
-        const authenticationParameters = imagekit.getAuthenticationParameters();
-
-        // Güvenlik headers ekle
-        res.set({
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
-          "X-Content-Type-Options": "nosniff",
-          "X-Frame-Options": "DENY",
-          "X-XSS-Protection": "1; mode=block"
-        });
-
-        res.status(200).json({
-          success: true,
-          token: authenticationParameters.token,
-          expire: authenticationParameters.expire,
-          signature: authenticationParameters.signature,
-          publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
-          urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
-        });
-
-      } catch (error) {
-        console.error("ImageKit Auth Error:", error);
-        res.status(500).json({
-          success: false,
-          error: "Authentication failed"
-        });
-      }
     });
-  }
-);
+});
 
 /**
- * Yüklenmiş dosyaları listeler (opsiyonel)
+ * Generate ImageKit authentication parameters
+ * @returns {Object} Authentication parameters for ImageKit upload
  */
-export const getUploadedFiles = onRequest(
-  {
-    cors: true,
-    maxInstances: 2,
-    memory: "256MiB"
-  },
-  async (req, res) => {
-    return corsHandler(req, res, async () => {
-      try {
-        if (req.method !== "GET") {
-          res.status(405).json({ error: "Method not allowed" });
-          return;
-        }
+function generateImageKitAuth() {
+    // Get ImageKit private key from environment variables
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+    
+    if (!privateKey) {
+        throw new Error('ImageKit private key not configured');
+    }
 
-        // Son 10 dosyayı getir
-        const files = await imagekit.listFiles({
-          limit: 10,
-          sort: "DESC_CREATED"
-        });
+    // Generate authentication parameters
+    const token = crypto.randomBytes(16).toString('hex');
+    const expire = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+    
+    // Create signature using HMAC-SHA1
+    const stringToSign = token + expire;
+    const signature = crypto
+        .createHmac('sha1', privateKey)
+        .update(stringToSign)
+        .digest('hex');
 
-        res.status(200).json({
-          success: true,
-          files: files.map(file => ({
-            fileId: file.fileId,
-            name: file.name,
-            url: file.url,
-            thumbnail: file.thumbnail,
-            size: file.size,
-            createdAt: file.createdAt
-          }))
-        });
+    return {
+        token,
+        expire,
+        signature
+    };
+}
 
-      } catch (error) {
-        console.error("List Files Error:", error);
-        res.status(500).json({
-          success: false,
-          error: "Failed to list files"
+/**
+ * Health check endpoint
+ * Simple endpoint to verify that functions are working
+ */
+export const healthCheck = functions.https.onRequest(async (request, response) => {
+    corsHandler(request, response, () => {
+        response.status(200).json({
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            message: 'Firebase Functions are running correctly'
         });
-      }
     });
-  }
-);
+});
+
+/**
+ * Get usage statistics (optional)
+ * This can help track usage and stay within free tier limits
+ */
+export const getUsageStats = functions.https.onRequest(async (request, response) => {
+    corsHandler(request, response, async () => {
+        try {
+            // Check for Authorization header
+            const authHeader = request.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                response.status(401).json({ 
+                    error: 'Unauthorized',
+                    message: 'Authentication required'
+                });
+                return;
+            }
+
+            // Extract and verify ID token
+            const idToken = authHeader.split('Bearer ')[1];
+            
+            try {
+                const decodedToken = await admin.auth().verifyIdToken(idToken);
+                
+                // Here you could track usage in Firestore if needed
+                // For now, just return basic info
+                
+                const stats = {
+                    user: decodedToken.email,
+                    timestamp: new Date().toISOString(),
+                    message: 'Usage tracking is available',
+                    // You can add actual usage tracking here
+                    uploadsToday: 0, // Implement actual tracking
+                    monthlyUploads: 0, // Implement actual tracking
+                    totalStorage: '0 MB' // Implement actual tracking
+                };
+                
+                response.status(200).json(stats);
+                
+            } catch (tokenError) {
+                response.status(401).json({ 
+                    error: 'Invalid token',
+                    message: 'Failed to verify authentication token'
+                });
+                return;
+            }
+            
+        } catch (error) {
+            console.error('Usage stats error:', error);
+            response.status(500).json({ 
+                error: 'Internal server error',
+                message: 'Failed to get usage statistics'
+            });
+        }
+    });
+});

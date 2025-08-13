@@ -1,0 +1,21 @@
+Tabii — işte **kopyala-yapıştır** kullanabileceğin nihai prompt (Replit’e veya geliştiriciye verilecek şekilde):
+
+> Bana Replit üzerinde çalışacak, tamamen ücretsiz planlar içinde kalacak şekilde tasarlanmış bir web projesi hazırla.
+> Projede şunlar olmalı:
+>
+> 1. **Kullanıcı Girişi:** Firebase Authentication sadece admin kullanıcısı için yapılandırılsın. Admin giriş yapmadan hiçbir yükleme veya yönetim işlemi yapılamasın.
+> 2. **Barındırma:** Site Firebase Hosting üzerinde yayınlansın. HTML, CSS ve JS dosyaları *minify* edilsin; gzip/brotli sıkıştırması aktif olsun. Hosting yapılandırması `cache-control` başlıklarını optimize edecek şekilde ayarlansın.
+> 3. **Depolama:** Fotoğraf yükleme işlemi ImageKit Storage üzerinden yapılsın. ImageKit `privateKey` frontend’e konmasın; yükleme için Firebase Functions (Node.js) kullanılarak güvenli bir ImageKit Authentication endpoint oluşturulsun.
+> 4. **Görsel Optimizasyonu (tarayıcı + CDN tarafı):**
+>        - Frontend yükleme öncesi dosyayı tarayıcıda `canvas` ile maksimum **1080px** genişliğe küçültsün.
+>        - JPG/PNG’ler otomatik **WebP** formatına dönüştürülsün (tarayıcı destek kontrolü yapılsın).
+>        - ImageKit üzerinden sunulan URL’ler için `cache-control: max-age=31536000` kullanılsın ve CDN caching politikasını optimize etsin.
+> 5. **Performans & Kod Kalitesi:** Kod **modüler**, **async/await** ile yazılmış ve gereksiz bağımlılıklardan arındırılmış olsun. Frontend minimal ve erişilebilir bir UI içersin (önizleme + yükleme butonu + hata/başarı bildirimleri).
+> 6. **Güvenlik & Limitler:**
+>        - Admin kimlik doğrulaması zorunlu.
+>        - Kullanıcı başına / admin başına aylık veya günlük yükleme limiti uygulanarak ImageKit ve Firebase free tier kotasının aşılması engellensin.
+>        - Tüm API istekleri HTTPS ile yapılsın, private key’ler sadece backend’de saklansın.
+> 7. **Dokümantasyon (README):** Adım adım: Replit’te çalıştırma, Firebase Hosting deploy, Firebase Authentication’a admin ekleme, ImageKit API anahtarlarının (public/private) güvenli şekilde eklenmesi ve environment değişkenleri nasıl konulacağı, free tier limitlerini izleyecek basit metrik veya uyarı önerisi.
+> 8. **Free Tier Uyum:** Proje varsayılan yapılandırmalarıyla **Firebase free tier** (hosting limitleri) ve **ImageKit free tier** (20 GB depolama, 20 GB trafik, dönüşüm limitleri) sınırlarını zorlamayacak şekilde ayarlı olsun; gerekli optimizasyonlar (resize, WebP, lazy-loading, thumbnail kullanımı) otomatik yapılsın.
+
+Kopyala-yapıştır kullanabilirsin. İstersen bu prompt’a dayanarak **Replit için örnek dosya yapısı ve temel kod iskeleti** (frontend + functions + README) hemen hazırlayayım.
